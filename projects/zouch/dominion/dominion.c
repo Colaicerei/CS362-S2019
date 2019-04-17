@@ -668,7 +668,7 @@ int adventurerEffect(int drawntreasure, int currentPlayer, struct gameState *sta
 }
 int councilRoomEffect(int currentPlayer, struct gameState *state, int handPos) {
      //+4 Cards
-     for (int i = 0; i < 4; i++)   //****introduced bug for assignment-2, loop one more round****
+     for (int i = 0; i < 4; i++)   
      {
           drawCard(currentPlayer, state);
      }
@@ -679,8 +679,8 @@ int councilRoomEffect(int currentPlayer, struct gameState *state, int handPos) {
      //Each other player draws a card
      for (int i = 0; i < state->numPlayers; i++)
      {
-          if (i != currentPlayer)
-          {
+          if (i == currentPlayer) //****introduced bug for assignment-2, change != to ==****
+          {    
                drawCard(i, state);
           }
      }
