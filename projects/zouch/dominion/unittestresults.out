@@ -1,0 +1,1827 @@
+
+---------- Unittest 1: Function AdventurerEffect() ----------
+
+Pass! The player gained exactly 2 cards in total.
+Pass! More than two cards were drawn from deck.
+Fail! Two less cards drawn should be discarded. There are 1 discarded cards but 2 drawns.
+Pass! The player received two additional treasure cards.
+Test Failed!
+
+File 'unittest1.c'
+Lines executed:80.00% of 50
+Branches executed:100.00% of 28
+Taken at least once:64.29% of 28
+Calls executed:62.50% of 16
+Creating 'unittest1.c.gcov'
+
+        -:    0:Source:unittest1.c
+        -:    0:Graph:unittest1.gcno
+        -:    0:Data:unittest1.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:/*requirment for adventurer effect: 
+        -:   10:•	Current player should receive exactly 2 cards, 
+        -:   11:•	Player should receive no other type of cards, which means 2 cards are treasure cards.
+        -:   12:•	The two cards should come from player’s own deck.
+        -:   13:•	1 card (adventurer) should be moved to the discard card pile??
+        -:   14:•	No state change should occur for other players.
+        -:   15:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   16:
+        -:   17:*/
+        -:   18:
+function testAdventurerEffect called 1 returned 100% blocks executed 76%
+        1:   19:void testAdventurerEffect() {
+        -:   20:
+        1:   21:	int failTest = 0;
+        1:   22:	int numPlayers = 4;
+        1:   23:	int seed = 1000;
+        1:   24:	int currentPlayer = 0;
+        -:   25:	int temphand[MAX_HAND];
+        1:   26:	int drawntreasure = 0;
+        1:   27:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   28:		remodel, smithy, village, baron, great_hall };
+        -:   29:		
+        1:   30:	struct gameState *testG = newGame();
+call    0 returned 100%
+        -:   31:
+        1:   32:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        -:   33:
+        1:   34:	printf("\n---------- Unittest 1: Function AdventurerEffect() ----------\n\n");
+call    0 returned 100%
+        -:   35:
+        1:   36:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   37:	int tempDeckCount = testG->deckCount[currentPlayer];
+        -:   38:
+        -:   39:	//save number of treasure cards before calling function
+        1:   40:	int tempTreasure = 0; 
+        6:   41:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+        6:   42:		if (testG->hand[currentPlayer][i] == copper ||
+branch  0 taken 20% (fallthrough)
+branch  1 taken 80%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        2:   43:			testG->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:   44:			testG->hand[currentPlayer][i] == gold)
+        -:   45:		{
+        4:   46:			tempTreasure++;
+        -:   47:		}
+        -:   48:	}
+        -:   49:	
+        -:   50:	//call test function and check return value
+        1:   51:	if (adventurerEffect(drawntreasure, currentPlayer, testG, temphand) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   52:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   53:		failTest = 1;
+        -:   54:	}
+        -:   55:
+        -:   56:	//check if player has additional tw2 cards on hand (two draws, no discard in the provided code) 
+        1:   57:	if (testG->handCount[currentPlayer] == (tempHandCount + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   58:		printf("Pass! The player gained exactly 2 cards in total.\n");
+call    0 returned 100%
+        -:   59:	}
+        -:   60:	else {
+    #####:   61:		printf("Fail! Two cards should be gained in total. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:   62:		failTest = 1;
+        -:   63:	}
+        -:   64:
+        -:   65:	//check if >= two cards are drawn from player's deck 
+        1:   66:	if (testG->deckCount[currentPlayer] <= (tempDeckCount - 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   67:		printf("Pass! More than two cards were drawn from deck.\n");
+call    0 returned 100%
+        -:   68:	}
+        -:   69:	else {
+    #####:   70:		printf("Fail! More than two cards should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:   71:		failTest = 1;
+        -:   72:	}
+        -:   73:
+        -:   74:	//check if discarded card and gained card matches drawn cards 
+        1:   75:	if (testG->discardCount[currentPlayer] + 2 == (tempDeckCount - testG->deckCount[currentPlayer])) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   76:		printf("Pass! The player discarded all other drawn cards than treasures.\n");
+call    0 never executed
+        -:   77:	}
+        -:   78:	else {
+        1:   79:		printf("Fail! Two less cards drawn should be discarded. There are %d discarded cards but %d drawns.\n", testG->discardCount[currentPlayer], tempDeckCount - testG->deckCount[currentPlayer]);
+call    0 returned 100%
+        1:   80:		failTest = 1;
+        -:   81:	}
+        -:   82:
+        -:   83:	//check if number of treasure cards increased by 2
+        1:   84:	int newTreasure = 0;
+        8:   85:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 88%
+branch  1 taken 13% (fallthrough)
+        8:   86:		if (testG->hand[currentPlayer][i] == copper ||
+branch  0 taken 14% (fallthrough)
+branch  1 taken 86%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        2:   87:			testG->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:   88:			testG->hand[currentPlayer][i] == gold)
+        -:   89:		{
+        6:   90:			newTreasure++;
+        -:   91:		}
+        -:   92:	}
+        1:   93:	if (newTreasure == (tempTreasure + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   94:		printf("Pass! The player received two additional treasure cards.\n");
+call    0 returned 100%
+        -:   95:	}
+        -:   96:	else {
+    #####:   97:		printf("Fail! Two treasure cards should be added. There are %d treasures now, previously %d.\n", newTreasure, tempTreasure);
+call    0 never executed
+    #####:   98:		failTest = 1;
+        -:   99:	}
+        -:  100:		
+        1:  101:	if (failTest == 1) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  102:		printf("Test Failed!\n\n");
+call    0 returned 100%
+        -:  103:	}
+        -:  104:	else {
+    #####:  105:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 never executed
+        -:  106:	}
+        1:  107:}
+        -:  108:
+        -:  109:
+function main called 1 returned 100% blocks executed 100%
+        1:  110:int main(int argc, char *argv[])
+        -:  111:{
+        1:  112:	testAdventurerEffect();
+call    0 returned 100%
+        1:  113:	return 0;
+        -:  114:}
+
+---------- Unittest 2: Function mineEffect() ----------
+
+
+*****TEST 1: choice1 = 4 (copper), choice 2 = 5 (silver)*****
+
+Pass! The player exchanged one card and discarded one card.
+Pass! No card was drawn from player's deck.
+Pass! The player discarded exactly two cards.
+Fail! Trade unsucessful, copper cards are 2 VS 4, silver cards are 1 VS 0.
+
+*****TEST 2: choice1 = 4 (copper), choice 2 = 6 (gold)*****
+
+Failed! Return value should be -1 for this greedy choice!
+
+*****TEST 3: choice1 = copper, choice 2 = 100 *****
+
+Pass! Return value is -1 for this invalid choice!
+Test Failed!
+
+File 'unittest2.c'
+Lines executed:81.33% of 75
+Branches executed:94.12% of 34
+Taken at least once:67.65% of 34
+Calls executed:72.41% of 29
+Creating 'unittest2.c.gcov'
+
+        -:    0:Source:unittest2.c
+        -:    0:Graph:unittest2.gcno
+        -:    0:Data:unittest2.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:/*requirment for mineEffect: 
+        -:   10:•	Current player should trash exactly one treasure card.
+        -:   11:•	Player should receive exactly one treasure card with up to one upper level of card trashed.
+        -:   12:•	Can also trash for other kingdom treasures.
+        -:   13:•	The cards should come from supply, no change to player’s deck.
+        -:   14:•	The card (mine) and trashed treasure are moved to the played card pile.
+        -:   15:•	No state change should occur for other players.
+        -:   16:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   17:*/
+        -:   18:
+function testMineEffect called 1 returned 100% blocks executed 77%
+        1:   19:void testMineEffect() {
+        -:   20:
+        1:   21:	int failTest = 0;
+        1:   22:	int numPlayers = 4;
+        1:   23:	int seed = 1000;
+        1:   24:	int currentPlayer = 0;
+        1:   25:	int handPos = 0;
+        1:   26:	int choice1 = 0, choice2 = 0;
+        1:   27:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   28:		remodel, smithy, village, baron, great_hall };
+        -:   29:		
+        -:   30:	
+        1:   31:	printf("\n---------- Unittest 2: Function mineEffect() ----------\n\n");
+call    0 returned 100%
+        -:   32:
+        1:   33:	struct gameState *testG = newGame();
+call    0 returned 100%
+        1:   34:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        1:   35:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   36:	int tempPlayedCount = testG->playedCardCount;
+        1:   37:	int tempDeckCount = testG->deckCount[currentPlayer];
+        -:   38:
+        -:   39:	// ----------- TEST 1: choice1 = copper and choice2 = silver --------------
+        1:   40:	printf("\n*****TEST 1: choice1 = 4 (copper), choice 2 = 5 (silver)*****\n\n");
+call    0 returned 100%
+        -:   41:
+        -:   42:	//choose choice 1 and call cardEffect and check return value
+        1:   43:	choice1 = copper;
+        1:   44:	choice2 = silver;
+        -:   45:
+        -:   46:	//save previous copper and silver card numbers
+        1:   47:	int tempCopper = 0, tempSilver = 0;
+        6:   48:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+        5:   49:		if (testG->hand[currentPlayer][i] == copper) {
+branch  0 taken 80% (fallthrough)
+branch  1 taken 20%
+        4:   50:			tempCopper++;
+        -:   51:		}
+        -:   52:	}
+        6:   53:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+        5:   54:		if (testG->hand[currentPlayer][i] == silver) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   55:			tempSilver++;
+        -:   56:		}
+        -:   57:	}
+        -:   58:
+        -:   59:	//call test function and check return value
+        1:   60:	if (mineEffect(currentPlayer, testG, choice1, choice2, handPos) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   61:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   62:		failTest = 1;
+        -:   63:	}
+        -:   64:
+        -:   65:	//check if player has one less one card on hand (one exchange and one discard) 
+        1:   66:	if (testG->handCount[currentPlayer] == tempHandCount - 1) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   67:		printf("Pass! The player exchanged one card and discarded one card.\n");
+call    0 returned 100%
+        -:   68:	}
+        -:   69:	else {
+    #####:   70:		printf("Fail! Card number should be one less. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:   71:		failTest = 1;
+        -:   72:	}
+        -:   73:
+        -:   74:	//check if no card was drawn from player's deck 
+        1:   75:	if (testG->deckCount[currentPlayer] == (tempDeckCount)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   76:		printf("Pass! No card was drawn from player's deck.\n");
+call    0 returned 100%
+        -:   77:	}
+        -:   78:	else {
+    #####:   79:		printf("Fail! One card should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:   80:		failTest = 1;
+        -:   81:	}
+        -:   82:
+        -:   83:	//check if played card number increased by 2 (mine + trashed treasure) 
+        1:   84:	if (testG->playedCardCount == (tempPlayedCount + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   85:		printf("Pass! The player discarded exactly two cards.\n");
+call    0 returned 100%
+        -:   86:	}
+        -:   87:	else {
+    #####:   88:		printf("Fail! Two cards should be moved to played pile. There are %d played cards now, previously %d.\n", testG->playedCardCount, tempPlayedCount);
+call    0 never executed
+    #####:   89:		failTest = 1;
+        -:   90:	}
+        -:   91:
+        -:   92:	//get new copper and silver card numbers
+        1:   93:	int newCopper = 0, newSilver = 0;
+        5:   94:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+        4:   95:		if (testG->hand[currentPlayer][i] == copper) {
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
+        2:   96:			newCopper++;
+        -:   97:		}
+        -:   98:	}
+        5:   99:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+        4:  100:		if (testG->hand[currentPlayer][i] == silver) {
+branch  0 taken 25% (fallthrough)
+branch  1 taken 75%
+        1:  101:			newSilver++;
+        -:  102:		}
+        -:  103:	}
+        -:  104:
+        -:  105:	//check if player has one less copper card and one more silver card
+        1:  106:	if (newCopper == (tempCopper - 1) && newSilver == (tempSilver + 1)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+branch  2 never executed
+branch  3 never executed
+    #####:  107:		printf("Pass! The player traded one copper for one silver.\n");
+call    0 never executed
+        -:  108:	}
+        -:  109:	else {
+        1:  110:		printf("Fail! Trade unsucessful, copper cards are %d VS %d, silver cards are %d VS %d.\n", newCopper, tempCopper, newSilver, tempSilver);
+call    0 returned 100%
+        1:  111:		failTest = 1;
+        -:  112:	}
+        -:  113:
+        -:  114:		
+        -:  115:	// ----------- TEST 2: choice1 = copper and choice2 = gold --------------
+        1:  116:	printf("\n*****TEST 2: choice1 = 4 (copper), choice 2 = 6 (gold)*****\n\n");
+call    0 returned 100%
+        -:  117:
+        -:  118:	//choose choice 1 and call cardEffect and check return value
+        1:  119:	choice1 = copper;
+        1:  120:	choice2 = gold;
+        -:  121:
+        1:  122:	struct gameState *testG2 = newGame();
+call    0 returned 100%
+        1:  123:	initializeGame(numPlayers, k, seed, testG2);
+call    0 returned 100%
+        -:  124:	
+        -:  125:	//call test function and check return value
+        1:  126:	if (mineEffect(currentPlayer, testG2, choice1, choice2, handPos) != -1) {
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+        1:  127:		printf("Failed! Return value should be -1 for this greedy choice!\n");
+call    0 returned 100%
+        1:  128:		failTest = 1;
+        -:  129:	}
+        -:  130:	else {
+    #####:  131:		printf("Pass! Return value is -1 for this greedy choice!\n");
+call    0 never executed
+        -:  132:	}
+        -:  133:
+        -:  134:
+        -:  135:	// ----------- TEST 3: choice1 = copper and choice2 = --------------
+        1:  136:	printf("\n*****TEST 3: choice1 = copper, choice 2 = 100 *****\n\n");
+call    0 returned 100%
+        -:  137:
+        -:  138:	//choose choice 1 and call cardEffect and check return value
+        1:  139:	choice1 = copper;
+        1:  140:	choice2 = 100;  //out of range
+        -:  141:
+        1:  142:	struct gameState *testG3 = newGame();
+call    0 returned 100%
+        1:  143:	initializeGame(numPlayers, k, seed, testG3);
+call    0 returned 100%
+        -:  144:
+        -:  145:	//call test function and check return value
+        1:  146:	if (mineEffect(currentPlayer, testG3, choice1, choice2, handPos) != -1) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  147:		printf("Failed! Return value should be -1 for out of range input!");
+call    0 never executed
+    #####:  148:		failTest = 1;
+        -:  149:	}
+        -:  150:	else {
+        1:  151:		printf("Pass! Return value is -1 for this invalid choice!\n");
+call    0 returned 100%
+        -:  152:	}
+        -:  153:	
+        -:  154:
+        1:  155:	if (failTest == 1) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  156:		printf("Test Failed!\n\n");
+call    0 returned 100%
+        -:  157:	}
+        -:  158:	else {
+    #####:  159:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 never executed
+        -:  160:	}
+        1:  161:}
+        -:  162:
+        -:  163:
+function main called 1 returned 100% blocks executed 100%
+        1:  164:int main(int argc, char *argv[])
+        -:  165:{
+        1:  166:	testMineEffect();
+call    0 returned 100%
+        1:  167:	return 0;
+        -:  168:}
+
+---------- Unittest 3: Function CouncilRoomEffect() ----------
+
+Fail! Three cards should be gained in total. The player has 9 cards on hand now, previously 5.
+Fail! Four cards should be drawn. The player's deck has 0 cards now, previously 5.
+Pass! The player discarded exactly one card.
+Pass! The player received additional one buy.
+Fail! Player 1 did not draw one card from deck.
+Fail! Player 2 did not draw one card from deck.
+Fail! Player 3 did not draw one card from deck.
+Test Failed!
+
+File 'unittest3.c'
+Lines executed:78.26% of 46
+Branches executed:90.00% of 20
+Taken at least once:55.00% of 20
+Calls executed:61.11% of 18
+Creating 'unittest3.c.gcov'
+
+        -:    0:Source:unittest3.c
+        -:    0:Graph:unittest3.gcno
+        -:    0:Data:unittest3.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:/*requirment for council_room card: 
+        -:   10:•	Current player should receive exactly 4 cards.
+        -:   11:•	the cards should come from his own pile.
+        -:   12:•	Current player should receive exactly one chance of purchase.
+        -:   13:•	the card (council_room) is moved to the played card pile.
+        -:   14:•	All other players draw a card
+        -:   15:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   16:*/
+        -:   17:
+function testCouncilRoomEffect called 1 returned 100% blocks executed 69%
+        1:   18:void testCouncilRoomEffect() {
+        -:   19:
+        1:   20:	int failTest = 0;
+        1:   21:	int numPlayers = 4;
+        1:   22:	int seed = 1000;
+        1:   23:	int currentPlayer = 0;
+        1:   24:	int handPos = 0;
+        1:   25:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   26:		remodel, smithy, village, baron, great_hall };
+        -:   27:		
+        1:   28:	struct gameState *testG = newGame();
+call    0 returned 100%
+        -:   29:
+        1:   30:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        -:   31:
+        1:   32:	printf("\n---------- Unittest 3: Function CouncilRoomEffect() ----------\n\n");
+call    0 returned 100%
+        -:   33:
+        1:   34:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   35:	int tempPlayedCount = testG->playedCardCount;
+        1:   36:	int tempDeckCount = testG->deckCount[currentPlayer];
+        1:   37:	int tempNumBuys = testG->numBuys;
+        -:   38:	
+        -:   39:	//call test function and check return value
+        1:   40:	if (councilRoomEffect(currentPlayer, testG, handPos) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   41:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   42:		failTest = 1;
+        -:   43:	}
+        -:   44:
+        -:   45:	//check if player has additional three cards on hand (four draws & one discard) 
+        1:   46:	if (testG->handCount[currentPlayer] == (tempHandCount + 3)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   47:		printf("Pass! The player gained exactly 3 cards in total.\n");
+call    0 never executed
+        -:   48:	}
+        -:   49:	else {
+        1:   50:		printf("Fail! Three cards should be gained in total. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 returned 100%
+        1:   51:		failTest = 1;
+        -:   52:	}
+        -:   53:
+        -:   54:	//check if four cards are drawn from player's deck 
+        1:   55:	if (testG->deckCount[currentPlayer] == (tempDeckCount - 4)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   56:		printf("Pass! Four cards were drawn from deck.\n");
+call    0 never executed
+        -:   57:	}
+        -:   58:	else {
+        1:   59:		printf("Fail! Four cards should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 returned 100%
+        1:   60:		failTest = 1;
+        -:   61:	}
+        -:   62:
+        -:   63:	//check if played card number increased by 1 
+        1:   64:	if (testG->playedCardCount == (tempPlayedCount + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   65:		printf("Pass! The player discarded exactly one card.\n");
+call    0 returned 100%
+        -:   66:	}
+        -:   67:	else {
+    #####:   68:		printf("Fail! One card should be moved to played pile. There are %d played cards now, previously %d.\n", testG->playedCardCount, tempPlayedCount);
+call    0 never executed
+    #####:   69:		failTest = 1;
+        -:   70:	}
+        -:   71:
+        -:   72:	//check if number of buys increased by 1 
+        1:   73:	if (testG->numBuys == (tempNumBuys + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   74:		printf("Pass! The player received additional one buy.\n");
+call    0 returned 100%
+        -:   75:	}
+        -:   76:	else {
+    #####:   77:		printf("Fail! Exactly one buy should be added. There are %d buys now, previously %d.\n", testG->numBuys, tempNumBuys);
+call    0 never executed
+    #####:   78:		failTest = 1;
+        -:   79:	}
+        -:   80:
+        -:   81:	//check if each other player draws a card
+        5:   82:	for (int i = 0; i < testG->numPlayers; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+        4:   83:		if (i != currentPlayer) {
+branch  0 taken 75% (fallthrough)
+branch  1 taken 25%
+        3:   84:			if (testG->handCount[currentPlayer] != tempHandCount + 1 || tempDeckCount - 1 != testG->deckCount[currentPlayer]) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+branch  2 never executed
+branch  3 never executed
+        3:   85:				printf("Fail! Player %d did not draw one card from deck.\n", i);
+call    0 returned 100%
+        3:   86:				failTest = 1;
+        -:   87:			}
+        -:   88:			else {
+    #####:   89:				printf("Player %d has drawn one card from deck.\n", i);
+call    0 never executed
+        -:   90:			}
+        -:   91:		}
+        -:   92:	}
+        -:   93:		
+        1:   94:	if (failTest == 1) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   95:		printf("Test Failed!\n\n");
+call    0 returned 100%
+        -:   96:	}
+        -:   97:	else {
+    #####:   98:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 never executed
+        -:   99:	}
+        1:  100:}
+        -:  101:
+        -:  102:
+function main called 1 returned 100% blocks executed 100%
+        1:  103:int main(int argc, char *argv[])
+        -:  104:{
+        1:  105:	testCouncilRoomEffect();
+call    0 returned 100%
+        1:  106:	return 0;
+        -:  107:}
+
+---------- Unittest 4: Function VillageEffect() ----------
+
+Pass! The player drawed one card and discarded one card.
+Pass! One card was drawn from deck.
+Pass! The player discarded exactly one card.
+Pass! The player received additional two actions.
+Test Passed! Results are As Expected!
+
+File 'unittest4.c'
+Lines executed:72.50% of 40
+Branches executed:100.00% of 12
+Taken at least once:50.00% of 12
+Calls executed:62.50% of 16
+Creating 'unittest4.c.gcov'
+
+        -:    0:Source:unittest4.c
+        -:    0:Graph:unittest4.gcno
+        -:    0:Data:unittest4.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:/*requirment for village effect: 
+        -:   10:•	Current player should receive exactly 1 card.
+        -:   11:•	The cards should come from his own pile.
+        -:   12:•	Current player should receive exactly 2 actions.
+        -:   13:•	The card (village) is moved to the played card pile.
+        -:   14:•	No state change should occur for other players.
+        -:   15:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   16:*/
+        -:   17:
+function testVillageEffect called 1 returned 100% blocks executed 59%
+        1:   18:void testVillageEffect() {
+        -:   19:
+        1:   20:	int failTest = 0;
+        1:   21:	int numPlayers = 4;
+        1:   22:	int seed = 1000;
+        1:   23:	int currentPlayer = 0;
+        1:   24:	int handPos = 0;
+        1:   25:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   26:		remodel, smithy, village, baron, great_hall };
+        -:   27:		
+        1:   28:	struct gameState *testG = newGame();
+call    0 returned 100%
+        -:   29:
+        1:   30:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        -:   31:
+        1:   32:	printf("\n---------- Unittest 4: Function VillageEffect() ----------\n\n");
+call    0 returned 100%
+        -:   33:
+        1:   34:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   35:	int tempPlayedCount = testG->playedCardCount;
+        1:   36:	int tempDeckCount = testG->deckCount[currentPlayer];
+        1:   37:	int tempNumActions = testG->numActions;
+        -:   38:	
+        -:   39:	//call test function and check return value
+        1:   40:	if (villageEffect(currentPlayer, testG, handPos) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   41:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   42:		failTest = 1;
+        -:   43:	}
+        -:   44:
+        -:   45:	//check if player has same number of cards on hand (one draw & one discard) 
+        1:   46:	if (testG->handCount[currentPlayer] == tempHandCount) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   47:		printf("Pass! The player drawed one card and discarded one card.\n");
+call    0 returned 100%
+        -:   48:	}
+        -:   49:	else {
+    #####:   50:		printf("Fail! Card number should be the same. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:   51:		failTest = 1;
+        -:   52:	}
+        -:   53:
+        -:   54:	//check if one card drawn from player's deck 
+        1:   55:	if (testG->deckCount[currentPlayer] == (tempDeckCount - 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   56:		printf("Pass! One card was drawn from deck.\n");
+call    0 returned 100%
+        -:   57:	}
+        -:   58:	else {
+    #####:   59:		printf("Fail! One card should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:   60:		failTest = 1;
+        -:   61:	}
+        -:   62:
+        -:   63:	//check if played card number increased by 1 
+        1:   64:	if (testG->playedCardCount == (tempPlayedCount + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   65:		printf("Pass! The player discarded exactly one card.\n");
+call    0 returned 100%
+        -:   66:	}
+        -:   67:	else {
+    #####:   68:		printf("Fail! One card should be moved to played pile. There are %d played cards now, previously %d.\n", testG->playedCardCount, tempPlayedCount);
+call    0 never executed
+    #####:   69:		failTest = 1;
+        -:   70:	}
+        -:   71:
+        -:   72:	//check if number of actions increased by 2 
+        1:   73:	if (testG->numActions == (tempNumActions + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   74:		printf("Pass! The player received additional two actions.\n");
+call    0 returned 100%
+        -:   75:	}
+        -:   76:	else {
+    #####:   77:		printf("Fail! Exactly two actions should be added. There are %d actions now, previously %d.\n", testG->numActions, tempNumActions);
+call    0 never executed
+    #####:   78:		failTest = 1;
+        -:   79:	}
+        -:   80:		
+        1:   81:	if (failTest == 1) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   82:		printf("Test Failed!\n\n");
+call    0 never executed
+        -:   83:	}
+        -:   84:	else {
+        1:   85:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 returned 100%
+        -:   86:	}
+        1:   87:}
+        -:   88:
+        -:   89:
+function main called 1 returned 100% blocks executed 100%
+        1:   90:int main(int argc, char *argv[])
+        -:   91:{
+        1:   92:	testVillageEffect();
+call    0 returned 100%
+        1:   93:	return 0;
+        -:   94:}
+---------------- - Testing Card : smithy----------------
+Fail. Two cards should be grain in total. The player has 8 cards on hand now, previously 5.
+Fail. Three cards should be drawn. The player's deck has 1 cards now, previously 5.
+Pass! The player discarded exactly one card.
+Test Failed!
+
+File 'cardtest1.c'
+Lines executed:80.56% of 36
+Branches executed:100.00% of 10
+Taken at least once:50.00% of 10
+Calls executed:64.29% of 14
+Creating 'cardtest1.c.gcov'
+
+        -:    0:Source:cardtest1.c
+        -:    0:Graph:cardtest1.gcno
+        -:    0:Data:cardtest1.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:#define TESTCARD "smithy"
+        -:   10:
+        -:   11:/*requirment for smithy card: 
+        -:   12:•	Current player should receive exactly 3 cards.
+        -:   13:•	3 cards should come from his own pile.
+        -:   14:•	1 card (smithy) is moved to the played card pile.
+        -:   15:•	No state change should occur for other players.
+        -:   16:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   17:*/
+        -:   18:
+function testCardSmithy called 1 returned 100% blocks executed 70%
+        1:   19:void testCardSmithy() {
+        -:   20:
+        1:   21:	int failTest = 0;
+        1:   22:	int numPlayers = 4;
+        1:   23:	int currentPlayer = 0;
+        1:   24:	int seed = 1000;
+        1:   25:	int handPos = 0;
+        1:   26:	int bonus = 0;
+        1:   27:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   28:		remodel, smithy, village, baron, great_hall };
+        -:   29:		
+        1:   30:	struct gameState *testG = newGame();
+call    0 returned 100%
+        -:   31:
+        1:   32:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        -:   33:
+        1:   34:	printf("---------------- - Testing Card : %s----------------\n", TESTCARD);
+call    0 returned 100%
+        -:   35:
+        1:   36:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   37:	int tempPlayedCount = testG->playedCardCount;
+        1:   38:	int tempDeckCount = testG->deckCount[currentPlayer];
+        -:   39:	
+        -:   40:	//call cardEffect and check return value
+        1:   41:	if (cardEffect(smithy, 0, 0, 0, testG, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   42:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   43:		failTest = 1;
+        -:   44:	}
+        -:   45:
+        -:   46:	//check if player has additional two cards on hand (three draws & one discard) 
+        1:   47:	if (testG->handCount[currentPlayer] == (tempHandCount + 2)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   48:		printf("Pass! The player gained exactly 3 cards and discarded one card.\n");
+call    0 never executed
+        -:   49:	}
+        -:   50:	else {
+        1:   51:		printf("Fail. Two cards should be grain in total. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 returned 100%
+        1:   52:		failTest = 1;
+        -:   53:	}
+        -:   54:
+        -:   55:	//check if three cards are drawn from player's deck 
+        1:   56:	if (testG->deckCount[currentPlayer] == (tempDeckCount - 3)) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   57:		printf("Pass! Three cards were drawn from deck.\n");
+call    0 never executed
+        -:   58:	}
+        -:   59:	else {
+        1:   60:		printf("Fail. Three cards should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 returned 100%
+        1:   61:		failTest = 1;
+        -:   62:	}
+        -:   63:
+        -:   64:	//check if played card number increased by 1 
+        1:   65:	if (testG->playedCardCount == (tempPlayedCount + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   66:		printf("Pass! The player discarded exactly one card.\n");
+call    0 returned 100%
+        -:   67:	}
+        -:   68:	else {
+    #####:   69:		printf("Fail. One card shouldl be moved to played pile. There are %d playeded cards now, previously %d.\n", testG->playedCardCount, tempPlayedCount);
+call    0 never executed
+    #####:   70:		failTest = 1;
+        -:   71:	}
+        -:   72:
+        1:   73:	if (failTest == 1) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   74:		printf("Test Failed!\n\n");
+call    0 returned 100%
+        -:   75:	}
+        -:   76:	else {
+    #####:   77:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 never executed
+        -:   78:	}
+        1:   79:}
+        -:   80:
+        -:   81:
+function main called 1 returned 100% blocks executed 100%
+        1:   82:int main(int argc, char *argv[])
+        -:   83:{
+        1:   84:	testCardSmithy();
+call    0 returned 100%
+        1:   85:	return 0;
+        -:   86:}
+----------------Testing Card : adventurer----------------
+
+*****TEST 1: Top two cards are treasures*****
+
+Pass! The player gained exactly 2 cards in total.
+Pass! Two cards were drawn from deck.
+Pass! The player received two additional treasure cards.
+
+*****TEST 2: Only Bottom two cards are treasures*****
+
+Pass! The player gained exactly 2 cards in total.
+Pass! No card left in player's deck.
+Pass! The player received two additional treasure cards.
+
+*****TEST 3: Only one treasure card available*****
+
+Pass! The player gained exactly 1 card in total.
+Pass! No card left in player's deck.
+Pass! The player received one additional treasure card.
+Test Passed! Results are As Expected!
+
+File 'cardtest2.c'
+Lines executed:79.51% of 122
+Branches executed:100.00% of 78
+Taken at least once:71.79% of 78
+Calls executed:64.86% of 37
+Creating 'cardtest2.c.gcov'
+
+        -:    0:Source:cardtest2.c
+        -:    0:Graph:cardtest2.gcno
+        -:    0:Data:cardtest2.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:#define TESTCARD "adventurer"
+        -:   10:
+        -:   11:/*requirment for adventurer card: 
+        -:   12:•	Current player should receive exactly 2 cards.
+        -:   13:•	Player should receive no other type of cards, meaning the  2 cards are treasure cards.
+        -:   14:•	The two cards should come from player’s own deck.
+        -:   15:•	I am not sure if the card adventurer should be moved to the played card pile, since the source code did not have call discard() function, so I assume this is not the case for simplicity of testing.
+        -:   16:•	No state change should occur for other players.
+        -:   17:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   18:*/
+        -:   19:
+function testCardAdventurer called 1 returned 100% blocks executed 77%
+        1:   20:void testCardAdventurer() {
+        -:   21:
+        1:   22:	int failTest = 0;
+        1:   23:	int numPlayers = 4;
+        1:   24:	int currentPlayer = 0;
+        1:   25:	int seed = 1000;
+        1:   26:	int handPos = 0;
+        1:   27:	int bonus = 0;
+        1:   28:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   29:		remodel, smithy, village, baron, great_hall };
+        -:   30:
+        1:   31:	struct gameState *testG = newGame();
+call    0 returned 100%
+        1:   32:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        -:   33:	
+        1:   34:	printf("----------------Testing Card : %s----------------\n", TESTCARD);
+call    0 returned 100%
+        -:   35:
+        1:   36:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   37:	int tempDeckCount = testG->deckCount[currentPlayer];
+        -:   38:
+        -:   39:	// ----------- TEST 1: Top two cards are treasures --------------
+        1:   40:	printf("\n*****TEST 1: Top two cards are treasures*****\n\n");
+call    0 returned 100%
+        -:   41:	
+        1:   42:	testG->deck[currentPlayer][tempDeckCount - 1] = silver;
+        1:   43:	testG->deck[currentPlayer][tempDeckCount - 2] = silver;
+        -:   44:
+        -:   45:	//save number of treasure cards before calling function
+        1:   46:	int tempTreasure = 0;
+        6:   47:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+        6:   48:		if (testG->hand[currentPlayer][i] == copper ||
+branch  0 taken 20% (fallthrough)
+branch  1 taken 80%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        2:   49:			testG->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:   50:			testG->hand[currentPlayer][i] == gold)
+        -:   51:		{
+        4:   52:			tempTreasure++;
+        -:   53:		}
+        -:   54:	}
+        -:   55:
+        -:   56:	//call cardEffect and check return value
+        1:   57:	if (cardEffect(adventurer, 0, 0, 0, testG, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   58:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   59:		failTest = 1;
+        -:   60:	}
+        -:   61:
+        -:   62:	//check if player has additional two cards on hand (two draws, no discard in the provided code) 
+        1:   63:	if (testG->handCount[currentPlayer] == (tempHandCount + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   64:		printf("Pass! The player gained exactly 2 cards in total.\n");
+call    0 returned 100%
+        -:   65:	}
+        -:   66:	else {
+    #####:   67:		printf("Fail! Two cards should be gained in total. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:   68:		failTest = 1;
+        -:   69:	}
+        -:   70:
+        -:   71:	//check if two cards are drawn from player's deck 
+        1:   72:	if (testG->deckCount[currentPlayer] == (tempDeckCount - 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   73:		printf("Pass! Two cards were drawn from deck.\n");
+call    0 returned 100%
+        -:   74:	}
+        -:   75:	else {
+    #####:   76:		printf("Fail! Two cards should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:   77:		failTest = 1;
+        -:   78:	}
+        -:   79:
+        -:   80:	//check if number of treasure cards increased by 2
+        1:   81:	int newTreasure = 0;
+        8:   82:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 88%
+branch  1 taken 13% (fallthrough)
+       10:   83:		if (testG->hand[currentPlayer][i] == copper ||
+branch  0 taken 43% (fallthrough)
+branch  1 taken 57%
+branch  2 taken 33% (fallthrough)
+branch  3 taken 67%
+        4:   84:			testG->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:   85:			testG->hand[currentPlayer][i] == gold)
+        -:   86:		{
+        6:   87:			newTreasure++;
+        -:   88:		}
+        -:   89:	}
+        1:   90:	if (newTreasure == (tempTreasure + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   91:		printf("Pass! The player received two additional treasure cards.\n");
+call    0 returned 100%
+        -:   92:	}
+        -:   93:	else {
+    #####:   94:		printf("Fail! Two treasure cards should be added. There are %d treasures now, previously %d.\n", newTreasure, tempTreasure);
+call    0 never executed
+    #####:   95:		failTest = 1;
+        -:   96:	}
+        -:   97:
+        -:   98:
+        -:   99:
+        -:  100:	// ----------- TEST 2: Bottom two cards are treasures --------------
+        1:  101:	printf("\n*****TEST 2: Only Bottom two cards are treasures*****\n\n");
+call    0 returned 100%
+        -:  102:
+        1:  103:	struct gameState *testG2 = newGame();
+call    0 returned 100%
+        1:  104:	initializeGame(numPlayers, k, seed, testG2);
+call    0 returned 100%
+        -:  105:
+        1:  106:	testG2->deck[currentPlayer][0] = silver;
+        1:  107:	testG2->deck[currentPlayer][1] = silver;
+        -:  108:
+        4:  109:	for (int i = 2; i < tempDeckCount; i++) {
+branch  0 taken 75%
+branch  1 taken 25% (fallthrough)
+        3:  110:		testG2->deck[currentPlayer][i] = province;
+        -:  111:	}
+        -:  112:
+        1:  113:	tempHandCount = testG2->handCount[currentPlayer];
+        1:  114:	tempDeckCount = testG2->deckCount[currentPlayer];
+        -:  115:
+        -:  116:	//save number of treasure cards before calling function
+        1:  117:	tempTreasure = 0;
+        6:  118:	for (int i = 0; i < testG2->handCount[currentPlayer]; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+        6:  119:		if (testG2->hand[currentPlayer][i] == copper ||
+branch  0 taken 20% (fallthrough)
+branch  1 taken 80%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        2:  120:			testG2->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:  121:			testG2->hand[currentPlayer][i] == gold)
+        -:  122:		{
+        4:  123:			tempTreasure++;
+        -:  124:		}
+        -:  125:	}
+        -:  126:
+        -:  127:	//call cardEffect and check return value
+        1:  128:	if (cardEffect(adventurer, 0, 0, 0, testG2, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  129:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:  130:		failTest = 1;
+        -:  131:	}
+        -:  132:
+        -:  133:	//check if player has additional two cards on hand (two draws, no discard in the provided code) 
+        1:  134:	if (testG2->handCount[currentPlayer] == (tempHandCount + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  135:		printf("Pass! The player gained exactly 2 cards in total.\n");
+call    0 returned 100%
+        -:  136:	}
+        -:  137:	else {
+    #####:  138:		printf("Fail! Two cards should be gained in total. The player has %d cards on hand now, previously %d.\n", testG2->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:  139:		failTest = 1;
+        -:  140:	}
+        -:  141:
+        -:  142:	//check if no card left at player's deck 
+        1:  143:	if (testG2->deckCount[currentPlayer] == 0) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  144:		printf("Pass! No card left in player's deck.\n");
+call    0 returned 100%
+        -:  145:	}
+        -:  146:	else {
+    #####:  147:		printf("Fail! Deck should be empty. The player's deck has %d cards now, previously %d.\n", testG2->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:  148:		failTest = 1;
+        -:  149:	}
+        -:  150:
+        -:  151:	//check if number of treasure cards increased by 2
+        1:  152:	newTreasure = 0;
+        8:  153:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 88%
+branch  1 taken 13% (fallthrough)
+       10:  154:		if (testG->hand[currentPlayer][i] == copper ||
+branch  0 taken 43% (fallthrough)
+branch  1 taken 57%
+branch  2 taken 33% (fallthrough)
+branch  3 taken 67%
+        4:  155:			testG->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:  156:			testG->hand[currentPlayer][i] == gold)
+        -:  157:		{
+        6:  158:			newTreasure++;
+        -:  159:		}
+        -:  160:	}
+        1:  161:	if (newTreasure == (tempTreasure + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  162:		printf("Pass! The player received two additional treasure cards.\n");
+call    0 returned 100%
+        -:  163:	}
+        -:  164:	else {
+    #####:  165:		printf("Fail! Two treasure cards should be added. There are %d treasures now, previously %d.\n", newTreasure, tempTreasure);
+call    0 never executed
+    #####:  166:		failTest = 1;
+        -:  167:	}
+        -:  168:
+        -:  169:
+        -:  170:
+        -:  171:	// ----------- TEST 3: Only one card is treasure --------------
+        1:  172:	printf("\n*****TEST 3: Only one treasure card available*****\n\n");
+call    0 returned 100%
+        -:  173:
+        1:  174:	struct gameState *testG3 = newGame();
+call    0 returned 100%
+        1:  175:	initializeGame(numPlayers, k, seed, testG3);
+call    0 returned 100%
+        -:  176:
+        1:  177:	testG3->deck[currentPlayer][0] = province;
+        1:  178:	testG3->deck[currentPlayer][1] = silver;
+        -:  179:
+        4:  180:	for (int i = 2; i < tempDeckCount; i++) {
+branch  0 taken 75%
+branch  1 taken 25% (fallthrough)
+        3:  181:		testG3->deck[currentPlayer][i] = province;
+        -:  182:	}
+        -:  183:
+        1:  184:	tempHandCount = testG3->handCount[currentPlayer];
+        1:  185:	tempDeckCount = testG3->deckCount[currentPlayer];
+        -:  186:
+        -:  187:
+        -:  188:	//save number of treasure cards before calling function
+        1:  189:	tempTreasure = 0;
+        6:  190:	for (int i = 0; i < testG3->handCount[currentPlayer]; i++) {
+branch  0 taken 83%
+branch  1 taken 17% (fallthrough)
+        6:  191:		if (testG3->hand[currentPlayer][i] == copper ||
+branch  0 taken 20% (fallthrough)
+branch  1 taken 80%
+branch  2 taken 100% (fallthrough)
+branch  3 taken 0%
+        2:  192:			testG3->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        1:  193:			testG3->hand[currentPlayer][i] == gold)
+        -:  194:		{
+        4:  195:			tempTreasure++;
+        -:  196:		}
+        -:  197:	}
+        -:  198:
+        -:  199:	//call cardEffect and check return value
+        1:  200:	if (cardEffect(adventurer, 0, 0, 0, testG3, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  201:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:  202:		failTest = 1;
+        -:  203:	}
+        -:  204:
+        -:  205:	//check if player has additional one card on hand (one draws, no discard in the provided code) 
+        1:  206:	if (testG3->handCount[currentPlayer] == (tempHandCount + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  207:		printf("Pass! The player gained exactly 1 card in total.\n");
+call    0 returned 100%
+        -:  208:	}
+        -:  209:	else {
+    #####:  210:		printf("Fail! Only one card should be gained in total. The player has %d cards on hand now, previously %d.\n", testG3->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:  211:		failTest = 1;
+        -:  212:	}
+        -:  213:
+        -:  214:	//check if no card left at player's deck 
+        1:  215:	if (testG2->deckCount[currentPlayer] == 0) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  216:		printf("Pass! No card left in player's deck.\n");
+call    0 returned 100%
+        -:  217:	}
+        -:  218:	else {
+    #####:  219:		printf("Fail! Deck should be empty. The player's deck has %d cards now, previously %d.\n", testG2->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:  220:		failTest = 1;
+        -:  221:	}
+        -:  222:
+        -:  223:	//check if number of treasure cards increased by 2
+        1:  224:	newTreasure = 0;
+        8:  225:	for (int i = 0; i < testG->handCount[currentPlayer]; i++) {
+branch  0 taken 88%
+branch  1 taken 13% (fallthrough)
+       10:  226:		if (testG3->hand[currentPlayer][i] == copper ||
+branch  0 taken 43% (fallthrough)
+branch  1 taken 57%
+branch  2 taken 67% (fallthrough)
+branch  3 taken 33%
+        5:  227:			testG3->hand[currentPlayer][i] == silver ||
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        2:  228:			testG3->hand[currentPlayer][i] == gold)
+        -:  229:		{
+        5:  230:			newTreasure++;
+        -:  231:		}
+        -:  232:	}
+        1:  233:	if (newTreasure == (tempTreasure + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  234:		printf("Pass! The player received one additional treasure card.\n");
+call    0 returned 100%
+        -:  235:	}
+        -:  236:	else {
+    #####:  237:		printf("Fail! One treasure card should be added. There are %d treasures now, previously %d.\n", newTreasure, tempTreasure);
+call    0 never executed
+    #####:  238:		failTest = 1;
+        -:  239:	}
+        -:  240:	
+        -:  241:
+        -:  242:
+        -:  243:
+        1:  244:	if (failTest == 1) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  245:		printf("Test Failed!\n\n");
+call    0 never executed
+        -:  246:	}
+        -:  247:	else {
+        1:  248:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 returned 100%
+        -:  249:	}
+        1:  250:}
+        -:  251:
+        -:  252:
+function main called 1 returned 100% blocks executed 100%
+        1:  253:int main(int argc, char *argv[])
+        -:  254:{
+        1:  255:	testCardAdventurer();
+call    0 returned 100%
+        1:  256:	return 0;
+        -:  257:}
+----------------Testing Card : great_hall----------------
+Pass! The player has drawn one card and discarded one card.
+Pass! One card was drawn from deck.
+Pass! The player discarded exactly one card.
+Pass! The player received additional 1 action.
+Test Passed! Results are As Expected!
+
+File 'cardtest3.c'
+Lines executed:73.17% of 41
+Branches executed:100.00% of 12
+Taken at least once:50.00% of 12
+Calls executed:62.50% of 16
+Creating 'cardtest3.c.gcov'
+
+        -:    0:Source:cardtest3.c
+        -:    0:Graph:cardtest3.gcno
+        -:    0:Data:cardtest3.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:#define TESTCARD "great_hall"
+        -:   10:
+        -:   11:/*requirment for great_hall card: 
+        -:   12:•	Current player should receive exactly 1 card.
+        -:   13:•	Player should receive exactly 1 actions.
+        -:   14:•	The cards should come from player’s own pile.
+        -:   15:•	1 card (Great Hall) should be moved to the played card pile.
+        -:   16:•	No state change should occur for other players.
+        -:   17:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   18:*/
+        -:   19:
+function testGreatHallCard called 1 returned 100% blocks executed 59%
+        1:   20:void testGreatHallCard() {
+        -:   21:
+        1:   22:	int failTest = 0;
+        1:   23:	int numPlayers = 4;
+        1:   24:	int currentPlayer = 0;
+        1:   25:	int seed = 1000;
+        1:   26:	int handPos = 0;
+        1:   27:	int bonus = 0;
+        1:   28:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   29:		remodel, smithy, village, baron, great_hall };
+        -:   30:
+        1:   31:	struct gameState *testG = newGame();
+call    0 returned 100%
+        -:   32:
+        1:   33:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        -:   34:
+        1:   35:	printf("----------------Testing Card : %s----------------\n", TESTCARD);
+call    0 returned 100%
+        -:   36:
+        1:   37:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   38:	int tempPlayedCount = testG->playedCardCount;
+        1:   39:	int tempDeckCount = testG->deckCount[currentPlayer];
+        1:   40:	int tempNumActions = testG->numActions;
+        -:   41:
+        -:   42:	//call cardEffect and check return value
+        1:   43:	if (cardEffect(great_hall, 0, 0, 0, testG, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   44:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   45:		failTest = 1;
+        -:   46:	}
+        -:   47:
+        -:   48:	//check if player has same number of cards on hand (one draw & one discard) 
+        1:   49:	if (testG->handCount[currentPlayer] == tempHandCount) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   50:		printf("Pass! The player has drawn one card and discarded one card.\n");
+call    0 returned 100%
+        -:   51:	}
+        -:   52:	else {
+    #####:   53:		printf("Fail! Card number should be the same. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:   54:		failTest = 1;
+        -:   55:	}
+        -:   56:
+        -:   57:	//check if one card drawn from player's deck 
+        1:   58:	if (testG->deckCount[currentPlayer] == (tempDeckCount - 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   59:		printf("Pass! One card was drawn from deck.\n");
+call    0 returned 100%
+        -:   60:	}
+        -:   61:	else {
+    #####:   62:		printf("Fail! One card should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:   63:		failTest = 1;
+        -:   64:	}
+        -:   65:
+        -:   66:	//check if played card number increased by 1 
+        1:   67:	if (testG->playedCardCount == (tempPlayedCount + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   68:		printf("Pass! The player discarded exactly one card.\n");
+call    0 returned 100%
+        -:   69:	}
+        -:   70:	else {
+    #####:   71:		printf("Fail! One card should be moved to played pile. There are %d played cards now, previously %d.\n", testG->playedCardCount, tempPlayedCount);
+call    0 never executed
+    #####:   72:		failTest = 1;
+        -:   73:	}
+        -:   74:
+        -:   75:	//check if number of actions increased by 1 
+        1:   76:	if (testG->numActions == (tempNumActions + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   77:		printf("Pass! The player received additional 1 action.\n");
+call    0 returned 100%
+        -:   78:	}
+        -:   79:	else {
+    #####:   80:		printf("Fail! Exactly 1 action should be added. There are %d actions now, previously %d.\n", testG->numActions, tempNumActions);
+call    0 never executed
+    #####:   81:		failTest = 1;
+        -:   82:	}
+        -:   83:
+        1:   84:	if (failTest == 1) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:   85:		printf("Test Failed!\n\n");
+call    0 never executed
+        -:   86:	}
+        -:   87:	else {
+        1:   88:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 returned 100%
+        -:   89:	}
+        1:   90:}
+        -:   91:
+        -:   92:
+function main called 1 returned 100% blocks executed 100%
+        1:   93:int main(int argc, char *argv[])
+        -:   94:{
+        1:   95:	testGreatHallCard();
+call    0 returned 100%
+        1:   96:	return 0;
+        -:   97:}
+----------------Testing Card : minion----------------
+
+*****TEST 1: choice1 = 1 = get 2 coins*****
+
+Pass! The player has one more action.
+Pass! The player has no drawn and discarded one card.
+Pass! No card was drawn from deck.
+Pass! The player discarded exactly one card.
+Pass! The player received additional 2 coins.
+
+*****TEST 2: choice1 = 0 && choice2 = 1 -> discard hand and redraw*****
+
+Pass! The player has one more action.
+Pass! The player discarded hand and redrawn 4 cards.
+Pass! Four cards were drawn from deck.
+Pass! The player discarded exactly 4 cards.
+Pass! No change to coins for choice 2.
+Pass! Player 1 has discard hand and drawn 4 cards from deck.
+Pass! Player 2 has discard hand and drawn 4 cards from deck.
+Pass! Player 3 has discard hand and drawn 4 cards from deck.
+
+*****TEST 3: choice1 = 0 && choice2 = 0 -> Do nothing*****
+
+Pass! The player has one more action.
+Pass! The player has no drawn and discarded one card.
+Pass! No card was drawn from deck.
+Pass! The player discarded exactly one card.
+Pass! No change to coins for choice 2.
+Test Passed! Results are As Expected!
+
+File 'cardtest4.c'
+Lines executed:66.67% of 117
+Branches executed:100.00% of 46
+Taken at least once:54.35% of 46
+Calls executed:57.45% of 47
+Creating 'cardtest4.c.gcov'
+
+        -:    0:Source:cardtest4.c
+        -:    0:Graph:cardtest4.gcno
+        -:    0:Data:cardtest4.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:#include "dominion.h"
+        -:    2:#include "dominion_helpers.h"
+        -:    3:#include <string.h>
+        -:    4:#include <stdio.h>
+        -:    5:#include <assert.h>
+        -:    6:#include "rngs.h"
+        -:    7:#include <stdlib.h>
+        -:    8:
+        -:    9:#define TESTCARD "minion"
+        -:   10:
+        -:   11:/*requirment for minion card: 
+        -:   12:•	Current player should receive exactly 1 extra action.
+        -:   13:•	Current player can choose Option 1: get 2 coins, OR
+        -:   14:•	Option 2: discard hand and redraw 4 cards.
+        -:   15:•	The cards should come from player’s own pile.
+        -:   16:•	If option 2 is chosen, other players with 5+ cards in hand should also discard hand and redraw 4 cards.
+        -:   17:•	No state change should occur to the victory card piles and kingdom card piles.
+        -:   18:*/
+        -:   19:
+function testMinionCard called 1 returned 100% blocks executed 57%
+        1:   20:void testMinionCard() {
+        -:   21:
+        1:   22:	int failTest = 0;
+        1:   23:	int numPlayers = 4;
+        1:   24:	int currentPlayer = 0;
+        1:   25:	int seed = 1000;
+        1:   26:	int handPos = 0;
+        1:   27:	int bonus = 0;
+        1:   28:	int choice1 = 0, choice2 = 0;
+        1:   29:	int k[10] = { adventurer, council_room, feast, gardens, mine,
+        -:   30:		remodel, smithy, village, baron, great_hall };
+        -:   31:
+        1:   32:	struct gameState *testG = newGame();
+call    0 returned 100%
+        -:   33:
+        1:   34:	initializeGame(numPlayers, k, seed, testG);
+call    0 returned 100%
+        -:   35:
+        1:   36:	printf("----------------Testing Card : %s----------------\n", TESTCARD);
+call    0 returned 100%
+        -:   37:
+        1:   38:	int tempHandCount = testG->handCount[currentPlayer];
+        1:   39:	int tempPlayedCount = testG->playedCardCount;
+        1:   40:	int tempDeckCount = testG->deckCount[currentPlayer];
+        1:   41:	int tempActions = testG->numActions;
+        1:   42:	int tempCoins = testG->coins;
+        -:   43:
+        -:   44:	// ----------- TEST 1: choice1 = 1 = get 2 coins --------------
+        1:   45:	printf("\n*****TEST 1: choice1 = 1 = get 2 coins*****\n\n");
+call    0 returned 100%
+        -:   46:
+        -:   47:	//choose choice 1 and call cardEffect and check return value
+        1:   48:	choice1 = 1;
+        1:   49:	if (cardEffect(minion, choice1, choice2, 0, testG, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:   50:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:   51:		failTest = 1;
+        -:   52:	}
+        -:   53:
+        -:   54:	//check if player has one more action
+        1:   55:	if (testG->numActions == (tempActions + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   56:		printf("Pass! The player has one more action.\n");
+call    0 returned 100%
+        -:   57:	}
+        -:   58:	else {
+    #####:   59:		printf("Fail! Action should increased by 1. The player has %d actions now, previously %d.\n", testG->numActions, tempActions);
+call    0 never executed
+    #####:   60:		failTest = 1;
+        -:   61:	}
+        -:   62:
+        -:   63:	//check if player has one less card on hand (no draw & one discard) 
+        1:   64:	if (testG->handCount[currentPlayer] == (tempHandCount - 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   65:		printf("Pass! The player has no drawn and discarded one card.\n");
+call    0 returned 100%
+        -:   66:	}
+        -:   67:	else {
+    #####:   68:		printf("Fail! Card number should be decreased by 1. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:   69:		failTest = 1;
+        -:   70:	}
+        -:   71:
+        -:   72:	//check if no card drawn from player's deck 
+        1:   73:	if (testG->deckCount[currentPlayer] == tempDeckCount) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   74:		printf("Pass! No card was drawn from deck.\n");
+call    0 returned 100%
+        -:   75:	}
+        -:   76:	else {
+    #####:   77:		printf("Fail! No card should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:   78:		failTest = 1;
+        -:   79:	}
+        -:   80:
+        -:   81:	//check if played card number increased by 1 
+        1:   82:	if (testG->playedCardCount == (tempPlayedCount + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   83:		printf("Pass! The player discarded exactly one card.\n");
+call    0 returned 100%
+        -:   84:	}
+        -:   85:	else {
+    #####:   86:		printf("Fail! One card should be moved to played pile. There are %d played cards now, previously %d.\n", testG->playedCardCount, tempPlayedCount);
+call    0 never executed
+    #####:   87:		failTest = 1;
+        -:   88:	}
+        -:   89:
+        -:   90:	//check if number of coins increased by 2 
+        1:   91:	if (testG->coins == (tempCoins + 2)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   92:		printf("Pass! The player received additional 2 coins.\n");
+call    0 returned 100%
+        -:   93:	}
+        -:   94:	else {
+    #####:   95:		printf("Fail! Exactly 2 coins should be added. There are %d coins now, previously %d.\n", testG->coins, tempCoins);
+call    0 never executed
+    #####:   96:		failTest = 1;
+        -:   97:	}
+        -:   98:
+        -:   99:	// ----------- TEST 2: choice1 = 0 && choice2 = 1 -> discard hand and redraw --------------
+        1:  100:	printf("\n*****TEST 2: choice1 = 0 && choice2 = 1 -> discard hand and redraw*****\n\n");
+call    0 returned 100%
+        1:  101:	choice1 = 0;
+        1:  102:	choice2 = 1;
+        1:  103:	tempHandCount = testG->handCount[currentPlayer];
+        1:  104:	tempPlayedCount = testG->playedCardCount;
+        1:  105:	tempDeckCount = testG->deckCount[currentPlayer];
+        1:  106:	tempActions = testG->numActions;
+        1:  107:	tempCoins = testG->coins;
+        -:  108:
+        1:  109:	if (cardEffect(minion, choice1, choice2, 0, testG, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  110:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:  111:		failTest = 1;
+        -:  112:	}
+        -:  113:
+        -:  114:	//check if player has one more action
+        1:  115:	if (testG->numActions == (tempActions + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  116:		printf("Pass! The player has one more action.\n");
+call    0 returned 100%
+        -:  117:	}
+        -:  118:	else {
+    #####:  119:		printf("Fail! Action should increased by 1. The player has %d actions now, previously %d.\n", testG->numActions, tempActions);
+call    0 never executed
+    #####:  120:		failTest = 1;
+        -:  121:	}
+        -:  122:
+        -:  123:	//check if player has four cards on hand (discard hand and 4 draws) 
+        1:  124:	if (testG->handCount[currentPlayer] == 4) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  125:		printf("Pass! The player discarded hand and redrawn 4 cards.\n");
+call    0 returned 100%
+        -:  126:	}
+        -:  127:	else {
+    #####:  128:		printf("Fail! Card number should be 4. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:  129:		failTest = 1;
+        -:  130:	}
+        -:  131:
+        -:  132:	//check if four cards drawn from player's deck 
+        1:  133:	if (testG->deckCount[currentPlayer] == tempDeckCount - 4){
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  134:		printf("Pass! Four cards were drawn from deck.\n");
+call    0 returned 100%
+        -:  135:		}
+        -:  136:	else {
+    #####:  137:			printf("Fail! Four cards should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:  138:			failTest = 1;
+        -:  139:		}
+        -:  140:
+        -:  141:		//check if played card number increased by 4 
+        1:  142:		if (testG->playedCardCount == (tempPlayedCount + tempHandCount)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  143:			printf("Pass! The player discarded exactly 4 cards.\n");
+call    0 returned 100%
+        -:  144:		}
+        -:  145:		else {
+    #####:  146:			printf("Fail! %d cards on hands should be moved to played pile.\n", tempHandCount);
+call    0 never executed
+    #####:  147:			failTest = 1;
+        -:  148:		}
+        -:  149:
+        -:  150:		//check if number of coins remains same 
+        1:  151:		if (testG->coins == (tempCoins)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  152:			printf("Pass! No change to coins for choice 2.\n");
+call    0 returned 100%
+        -:  153:		}
+        -:  154:		else {
+    #####:  155:			printf("Fail! No coins should be added for choice 2. There are %d coins now, previously %d.\n", testG->coins, tempCoins);
+call    0 never executed
+    #####:  156:			failTest = 1;
+        -:  157:		}
+        -:  158:	
+        -:  159:		//check if each other player has four cards on hand (discard hand and 4 draws)
+        5:  160:		for (int i = 0; i < testG->numPlayers; i++) {
+branch  0 taken 80%
+branch  1 taken 20% (fallthrough)
+        4:  161:			if (i != currentPlayer) {
+branch  0 taken 75% (fallthrough)
+branch  1 taken 25%
+        3:  162:				if (testG->handCount[currentPlayer] != 4 || 1 != testG->deckCount[currentPlayer]) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+branch  2 taken 0% (fallthrough)
+branch  3 taken 100%
+    #####:  163:					printf("Fail! Player %d did not discarad hand and draw four cards from deck.\n", i);
+call    0 never executed
+    #####:  164:					failTest = 1;
+        -:  165:				}
+        -:  166:				else {
+        3:  167:					printf("Pass! Player %d has discard hand and drawn 4 cards from deck.\n", i);
+call    0 returned 100%
+        -:  168:				}
+        -:  169:			}
+        -:  170:		}
+        -:  171:
+        -:  172:	// ----------- TEST 3: choice1 = 0 && choice2 = 0 -> Nothing happens --------------
+        1:  173:	printf("\n*****TEST 3: choice1 = 0 && choice2 = 0 -> Do nothing*****\n\n");
+call    0 returned 100%
+        1:  174:	choice1 = 0;
+        1:  175:	choice2 = 0;
+        1:  176:	tempHandCount = testG->handCount[currentPlayer];
+        1:  177:	tempPlayedCount = testG->playedCardCount;
+        1:  178:	tempDeckCount = testG->deckCount[currentPlayer];
+        1:  179:	tempActions = testG->numActions;
+        1:  180:	tempCoins = testG->coins;
+        -:  181:
+        1:  182:	if (cardEffect(minion, choice1, choice2, 0, testG, handPos, &bonus) != 0) {
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+    #####:  183:		printf("Failed! Return value is not zero!");
+call    0 never executed
+    #####:  184:		failTest = 1;
+        -:  185:	}
+        -:  186:
+        -:  187:	//check if player has one more action
+        1:  188:	if (testG->numActions == (tempActions + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  189:		printf("Pass! The player has one more action.\n");
+call    0 returned 100%
+        -:  190:	}
+        -:  191:	else {
+    #####:  192:		printf("Fail! Action should increased by 1. The player has %d actions now, previously %d.\n", testG->numActions, tempActions);
+call    0 never executed
+    #####:  193:		failTest = 1;
+        -:  194:	}
+        -:  195:
+        -:  196:	//check if player has one less card on hand (no draw & one discard) 
+        1:  197:	if (testG->handCount[currentPlayer] == (tempHandCount - 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  198:		printf("Pass! The player has no drawn and discarded one card.\n");
+call    0 returned 100%
+        -:  199:	}
+        -:  200:	else {
+    #####:  201:		printf("Fail! Card number should be decreased by 1. The player has %d cards on hand now, previously %d.\n", testG->handCount[currentPlayer], tempHandCount);
+call    0 never executed
+    #####:  202:		failTest = 1;
+        -:  203:	}
+        -:  204:
+        -:  205:	//check if no card drawn from player's deck 
+        1:  206:	if (testG->deckCount[currentPlayer] == tempDeckCount){
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  207:		printf("Pass! No card was drawn from deck.\n");
+call    0 returned 100%
+        -:  208:		}
+        -:  209:	else {
+    #####:  210:			printf("Fail! No card should be drawn. The player's deck has %d cards now, previously %d.\n", testG->deckCount[currentPlayer], tempDeckCount);
+call    0 never executed
+    #####:  211:			failTest = 1;
+        -:  212:		}
+        -:  213:
+        -:  214:		//check if played card number increased by 1 
+        1:  215:		if (testG->playedCardCount == (tempPlayedCount + 1)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  216:			printf("Pass! The player discarded exactly one card.\n");
+call    0 returned 100%
+        -:  217:		}
+        -:  218:		else {
+    #####:  219:			printf("Fail! One card should be moved to played pile. There are %d played cards now, previously %d.\n", testG->playedCardCount, tempPlayedCount);
+call    0 never executed
+    #####:  220:			failTest = 1;
+        -:  221:		}
+        -:  222:
+        -:  223:		//check if number of coins remains same 
+        1:  224:		if (testG->coins == (tempCoins)) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:  225:			printf("Pass! No change to coins for choice 2.\n");
+call    0 returned 100%
+        -:  226:		}
+        -:  227:		else {
+    #####:  228:			printf("Fail! No coins should be added for choice 2. There are %d coins now, previously %d.\n", testG->coins, tempCoins);
+call    0 never executed
+    #####:  229:			failTest = 1;
+        -:  230:		}
+        -:  231:
+        1:  232:	if (failTest == 1) {
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+    #####:  233:		printf("Test Failed!\n\n");
+call    0 never executed
+        -:  234:	}
+        -:  235:	else {
+        1:  236:		printf("Test Passed! Results are As Expected!\n\n");
+call    0 returned 100%
+        -:  237:	}
+        1:  238:}
+        -:  239:
+        -:  240:
+function main called 1 returned 100% blocks executed 100%
+        1:  241:int main(int argc, char *argv[])
+        -:  242:{
+        1:  243:	testMinionCard();
+call    0 returned 100%
+        1:  244:	return 0;
+        -:  245:}
