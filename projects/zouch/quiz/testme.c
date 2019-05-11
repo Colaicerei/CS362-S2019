@@ -14,14 +14,14 @@ char inputChar()
 char *inputString()
 {
     // TODO: rewrite this function
-	// include only lower case letters, 97~122, or from e to t, 101~116
+	// include only lower case letters, 97~122, (or reduce to e to t, 101~116 if too long to run)
 	int len = 6;
 	char* randomStr;
 	randomStr = malloc(len * sizeof(char));
 	
 	int i;
 	for (i = 0; i < len - 1; i++) {
-		randomStr[i] = rand() % 26 + 97;
+		randomStr[i] = rand() % 16 + 101;
 	}
 	randomStr[len] = '\0';
     return randomStr;
