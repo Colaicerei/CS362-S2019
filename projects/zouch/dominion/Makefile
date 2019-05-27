@@ -35,7 +35,7 @@ player: player.c interface.o
 
 all: playdom player 
 
-randomtestresults: randomtestcard1.c randomtestadventurer.c dominion.c rngs.o interface.o
+randomtestresults: randomtestcard1.c randomtestcard2.c randomtestadventurer.c dominion.c rngs.o interface.o
 	gcc -o randomtestcard1 -g randomtestcard1.c dominion.c rngs.o interface.o $(CFLAGS)
 	./randomtestcard1 >> randomtestresults.out
 	gcov -fb dominion.c >> randomtestresults.out
